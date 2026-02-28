@@ -16,9 +16,66 @@ description: 海外で成功しているWebアプリを発見→超詳細に分�
 5. **`any` 型の使用を絶対に禁止する** — `unknown`、具体的な型、ジェネリクスを使うこと。
 6. **gitコミットメッセージは必ず日本語**で書くこと。
 
+## 前提条件チェック（ワークフロー開始前に必ず実行）
+
+**ワークフロー開始前に、以下の全ツール・アカウントが揃っているかチェックし、不足があればユーザーに確認すること。**
+
+### 1. CLIツール（自動チェック）
+
+以下のコマンドを実行して全ツールの存在を一括確認する:
+
+```bash
+echo "=== 前提条件チェック ===" && \
+echo -n "Node.js: " && (node -v 2>/dev/null || echo "❌ 未インストール → https://nodejs.org/") && \
+echo -n "npm: " && (npm -v 2>/dev/null || echo "❌ 未インストール") && \
+echo -n "git: " && (git --version 2>/dev/null || echo "❌ 未インストール") && \
+echo -n "GitHub CLI (gh): " && (gh --version 2>/dev/null | head -1 || echo "❌ 未インストール → brew install gh") && \
+echo -n "Vercel CLI: " && (npx vercel --version 2>/dev/null || echo "❌ 未インストール → npm i -g vercel") && \
+echo "=== チェック完了 ==="
+```
+
+**必須ツール一覧:**
+
+| ツール | 最低バージョン | 用途 | インストール方法 |
+|--------|---------------|------|-----------------|
+| Node.js | 18+ | 開発ランタイム | `brew install node` or https://nodejs.org/ |
+| npm | 9+ | パッケージ管理 | Node.jsに同梱 |
+| git | 2.x | バージョン管理 | `brew install git` |
+| GitHub CLI (gh) | 2.x | リポジトリ作成・管理 | `brew install gh` → `gh auth login` |
+| Vercel CLI | latest | デプロイ | `npm i -g vercel` → `vercel login` |
+
+### 2. アカウント・サービス（ユーザーに確認）
+
+**ユーザーに以下を確認すること（未取得のものがあれば案内する）:**
+
+| サービス | 用途 | 登録URL |
+|---------|------|---------|
+| GitHub | ソースコード管理 | https://github.com |
+| Vercel | フロントエンドデプロイ | https://vercel.com |
+| Convex | バックエンド/DB | https://www.convex.dev |
+| Clerk | 認証 (Phase 8で使用) | https://clerk.com |
+
+### 3. 不足ツールの自動インストール（ユーザー許可後）
+
+チェックで不足が見つかった場合、ユーザーに以下を提示して許可を得てからインストール:
+
+```bash
+# 不足ツールのインストール例（必要なもののみ実行）
+brew install node           # Node.js
+brew install gh && gh auth login   # GitHub CLI
+npm i -g vercel && vercel login    # Vercel CLI
+```
+
+**全ツールが揃うまでワークフローを開始しない。**
+
+---
+
 ## Workflow Checklist
 
 ```
+━━━ ステージ0: 前提条件 ━━━
+- [ ] 前提条件チェック: CLI・アカウント確認（不足があればインストール）
+
 ━━━ ステージ1: リサーチ & 分析（順次） ━━━
 - [ ] Phase 0: 開発済みプロダクト確認
 - [ ] Phase 1: ディープリサーチ（5件以上発見、Webアプリのみ）
