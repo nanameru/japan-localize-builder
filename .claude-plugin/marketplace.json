@@ -1,0 +1,21 @@
+{
+  "name": "japan-localize-skills",
+  "owner": {
+    "name": "Taiyo Kimura"
+  },
+  "metadata": {
+    "description": "海外プロダクトを日本市場向けにローカライズ＆開発する自動化スキル",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "japan-localize-builder",
+      "description": "海外で成功しているWebアプリを発見→分析→日本向けにローカライズ開発するフルスタックスキル",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/japan-localize-builder"
+      ]
+    }
+  ]
+}
