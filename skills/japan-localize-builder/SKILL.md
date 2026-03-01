@@ -1,18 +1,18 @@
 ---
 name: japan-localize-builder
-description: 海外で成功しているWebアプリを発見→超詳細に分析→日本向けにローカライズ→Claude Codeで直接開発するフルスタック自動化スキル。「日本向けにローカライズして」「海外アプリを日本で作りたい」「海外プロダクトを日本版にして」「ローカライズ開発」「Japan localize」「日本市場向けに」などと言われたら使う。
+description: 海外で成功しているWebアプリを発見→超詳細に分析→日本向けにローカライズ→ACP（Claude Code）セッションで実装するフルスタック自動化スキル。「日本向けにローカライズして」「海外アプリを日本で作りたい」「海外プロダクトを日本版にして」「ローカライズ開発」「Japan localize」「日本市場向けに」などと言われたら使う。
 ---
 
 # Japan Localize Builder
 
-海外で成功しているプロダクトを発見→超詳細に分析→日本向け要件定義→Claude Codeで直接開発するワークフロー。
+海外で成功しているプロダクトを発見→超詳細に分析→日本向け要件定義→ACP（Claude Code）セッションで開発するワークフロー。
 
 ## 絶対ルール
 
 1. **既存プロダクトのリソースに触らない** — 他のプロダクトのClerkアプリ、Convexプロジェクト、Vercelプロジェクト、GitHub リポジトリ等を一切変更・流用しない。**必ず新規作成する。**
 2. **Clerkは毎回新規アプリ作成** — 既存のAPIキーを使い回さない。
 3. **Convexも毎回新規プロジェクト** — `npx convex dev` で新規作成。既存プロジェクトに接続しない。
-4. **コーディングはClaude Codeが直接行う** — Write/Edit/Bashツールを使って直接ファイルを作成・編集する。外部CLIツール（Codex CLI等）は使用しない。
+4. **コーディングはACP（Claude Code）セッションで行う** — `sessions_spawn`（`runtime: "acp"`）でClaude Codeセッションを起動し、実装はそのセッション内で完了させる。ローカルのWrite/Edit/Bashでの直接実装に切り替えない。
 5. **`any` 型の使用を絶対に禁止する** — `unknown`、具体的な型、ジェネリクスを使うこと。
 6. **gitコミットメッセージは必ず日本語**で書くこと。
 
@@ -86,7 +86,7 @@ npm i -g vercel && vercel login    # Vercel CLI
 - [ ] Phase 3-A: ローカライズ戦略ドキュメント作成
 - [ ] Phase 3-B: 超詳細要件定義書作成
 
-━━━ ステージ3: 開発（Claude Codeが直接実装） ━━━
+━━━ ステージ3: 開発（ACP: Claude Codeセッション） ━━━
 - [ ] Phase 4: プロジェクト作成→コード実装→完了
 
 ━━━ ステージ4: 品質保証 ━━━
@@ -258,9 +258,15 @@ date '+%Y年%m月%d日 %H:%M %Z'
 
 ---
 
-### Phase 4: Claude Codeによる直接開発
+### Phase 4: ACP（Claude Code）による開発
 
-requirements.mdに基づいて、Claude Codeが直接コードを書く。
+requirements.mdに基づいて、ACPハーネスでClaude Codeセッションを起動して実装する。
+
+**0. ACPセッション起動（必須）**
+- `sessions_spawn` を使い、`runtime: "acp"` でセッションを作成する。
+- `agentId` は明示指定する（環境に `acp.defaultAgent` がある場合を除く）。
+- Discordでは `thread: true`, `mode: "session"` をデフォルトにする。
+- 以後の実装・修正はそのACPセッションに対して指示して進める。
 
 **1. プロジェクト初期化**
 ```bash
@@ -300,8 +306,8 @@ if (!mounted || !isValidClerkKey(clerkPubKey)) {
 - サイドバー等のClient Componentは別ファイル `src/components/dashboard-shell.tsx` に分離
 - `UserButton` (Clerk) は `dynamic(() => import("@clerk/nextjs").then(...), { ssr: false })` で読み込む
 
-**5. コード実装（Claude Codeが直接書く）**
-Write/Editツールで以下を順に実装:
+**5. コード実装（ACPセッションで実装）**
+ACPセッションへ以下を順に実装指示:
 1. Convexスキーマ (`convex/schema.ts`)
 2. Convex関数 (`convex/` 内のqueries/mutations/actions)
 3. `convex/convex.config.ts` — `import { defineApp } from "convex/server"; const app = defineApp(); export default app;`
@@ -477,7 +483,7 @@ npx vercel --prod
 │                                         │
 │  1. 本番URLをWebFetchで全画面確認       │
 │  2. 問題リスト作成                       │
-│  3. Claude Codeで直接修正               │
+│  3. ACPのClaude Codeセッションで修正     │
 │  4. git commit & push                   │
 │  5. 問題が残っていれば → 1に戻る         │
 │                                         │
